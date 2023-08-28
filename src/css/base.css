@@ -3,7 +3,9 @@ body {
   margin: 0;
   padding: 0;
 }
-
+.visible{
+  display: none;
+}
 button {
   margin: 0;
   padding: 0;
@@ -124,7 +126,7 @@ body {
   box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
   border-radius: 8px;
 }
-
+/*Aca esta el main*/
 .main {
   position: relative;
   z-index: 2;
@@ -286,7 +288,7 @@ body {
 .todo-list li.editing:last-child {
   margin-bottom: -1px;
 }
-
+/*Aca esta el footer*/
 .footer {
   padding: 1rem 1.5rem;
   height: 20px;
