@@ -1,15 +1,26 @@
 export class Task {
-  constructor({id, title, completed = false}){
-    this.id = id
+  constructor({title, completed = false}){
     this.title = title
     this.completed = completed
   }
 }
 export class User {
-  constructor(){
-    this.tasks = []
+  constructor(size){
+    this.table = new Array(size)
   }
-  addTask(task){
-    this.tasks.push(task)
+  hash(key){
+    let total = 0
+    for(let i = 0; i < key.length; i++){
+      total += key.charCodeAt(i) / 2
+    }
+    total = total % this.table.length
+    return total
+  }
+  addTask(key, boolean = false){
+    const hash = this.hash(key)
+    if(!this.table[hash]){
+      this.table[hash] = []
+    }
+    this.table[hash].push([key, boolean])
   }
 }
