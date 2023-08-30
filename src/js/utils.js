@@ -23,4 +23,20 @@ export class User {
     }
     this.table[hash].push([key, boolean])
   }
+  addValue(key, value){
+    const hash = this.hash(key)
+    for(let i = 0; i < this.table[hash].length; i++){
+      if(this.table[hash][i][0] === key){
+        this.table[hash][i][1] = value
+      }
+    }
+  }
+  getKey(key){
+    const hash = this.hash(key)
+    for(let i = 0; i < this.table[hash].length; i++){
+      if(this.table[hash][i][0] === key){
+        return this.table[hash][i][0]
+      }
+    }
+  }
 }
