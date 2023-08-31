@@ -35,8 +35,12 @@ export class User {
     const hash = this.hash(key)
     for(let i = 0; i < this.table[hash].length; i++){
       if(this.table[hash][i][0] === key){
-        return this.table[hash][i][0]
+        return this.table[hash][i]
       }
     }
+  }
+  deleteKey(key){
+    const hash = this.hash(key)
+    delete this.table[hash]
   }
 }

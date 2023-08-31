@@ -1,7 +1,7 @@
 import "./css/base.css";
 import { Task, User } from "./js/utils";
 import node from "./js/nodes"
-node.inputNewTodo.addEventListener('keydown', validateTask)
+node.inputNewTodo.addEventListener('keydown', validateTask({}))
 node.footer.classList.add('visible')
 node.main.classList.add('visible')
 const user = new User(50)
@@ -15,13 +15,13 @@ function structureTaskAdd(text){
     input.classList.add('toggle')
     input.addEventListener('click', (event) => {
         li.classList.toggle('completed')
-        if(event.target.offsetParent.className){
+        if(event.target.offsetParent.className == 'completed'){
             user.addValue(event.target.nextSibling.innerText.trim(), true)
         }
         else{
             user.addValue(event.target.nextSibling.innerText.trim(), false)
         }
-        console.log(user)
+        // console.log(user)
         // console.log(user)
     })
     const label = document.createElement('label')
@@ -30,7 +30,7 @@ function structureTaskAdd(text){
         li.classList.toggle('editing')
         // console.log(event.target.parentElement.parentNode.className === editing)
         inputEdit.value = event.target.innerText
-        inputEdit.addEventListener('keydown', validateTask)
+        inputEdit.addEventListener('keydown', validateTask({edit : true, nodes : [li, label]}))
     })
     const button = document.createElement('button')
     button.classList.add('destroy')
@@ -42,28 +42,42 @@ function structureTaskAdd(text){
     node.listUnordened.appendChild(li)
 
 }
-function validateTask(event){
-    if(event.key === 'Enter'){
-        if(!Number(event.target.value) && event.target.value.length !== 0){
-            const task = new Task({title: event.target.value})
-            user.addTask(task.title.trim(), task.completed)
-            console.log(user)
-            tasks()
-            structureTaskAdd(task.title)
-        }
-        else{
-            throw new Error('No se puede asignar esa tarea')
+function validateTask({edit = false, nodes = null}){
+    return function(event){
+        if(event.key === 'Enter'){
+            if(!Number(event.target.value) && event.target.value.length !== 0){
+                const task = new Task({title: event.target.value})
+                if(edit){
+                    console.log(event)
+                    user.deleteKey(nodes[1].innerText)
+                    nodes[0].classList.remove('editing')
+                    nodes[1].innerText = task.title
+                    user.addTask(task.title.trim(), task.completed)
+                    console.log(user)
+                }
+                else{
+                user.addTask(task.title.trim(), task.completed)
+                console.log(user)
+                tasks()
+                structureTaskAdd(task.title)
+                }
+            }
+            else{
+                throw new Error('No se puede asignar esa tarea')
+            }
         }
     }
-}
-function editTask(event){
-    if(event.key === 'Enter'){
-        if(!Number(event.target.value) && event.target.value.length !== 0){
-        }
-        else{
-            throw new Error('No se puede asignar esa tarea')
-        }
-    }
+// }
+// function editTask(event){
+//     if(event.key === 'Enter'){
+//         if(!Number(event.target.value) && event.target.value.length !== 0){
+//         // const task = new Task({title: event.target, completed})
+//         event.target.value    
+//         }
+//         else{
+//             throw new Error('No se puede asignar esa tarea')
+//         }
+//     }
 }
 function tasks(){
             node.footer.classList.remove('visible')
