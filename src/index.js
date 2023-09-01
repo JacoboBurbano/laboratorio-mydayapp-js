@@ -1,7 +1,9 @@
 import "./css/base.css";
 import { Task, User } from "./js/utils";
 import node from "./js/nodes"
+let count =  Number(node.taskPending.firstChild.textContent)
 node.inputNewTodo.addEventListener('keydown', validateTask({}))
+node.buttonClear.addEventListener('click', clearTask)
 node.footer.classList.add('visible')
 node.main.classList.add('visible')
 const user = new User(50)
@@ -13,17 +15,7 @@ function structureTaskAdd(text){
     const input = document.createElement('input')
     input.setAttribute('type', 'checkbox')
     input.classList.add('toggle')
-    input.addEventListener('click', (event) => {
-        li.classList.toggle('completed')
-        if(event.target.offsetParent.className == 'completed'){
-            user.addValue(event.target.nextSibling.innerText.trim(), true)
-        }
-        else{
-            user.addValue(event.target.nextSibling.innerText.trim(), false)
-        }
-        // console.log(user)
-        // console.log(user)
-    })
+    input.addEventListener('click', inputLogic(li))
     const label = document.createElement('label')
     label.innerText = text
     li.addEventListener('dblclick', (event)=> {
@@ -53,55 +45,61 @@ function validateTask({edit = false, nodes = null}){
                     nodes[0].classList.remove('editing')
                     nodes[1].innerText = task.title
                     user.addTask(task.title.trim(), task.completed)
-                    console.log(user)
                 }
                 else{
                 user.addTask(task.title.trim(), task.completed)
-                console.log(user)
+                node.inputNewTodo.value = ''
                 tasks()
                 structureTaskAdd(task.title)
+                count++
+                pendingTask()
                 }
             }
             else{
                 throw new Error('No se puede asignar esa tarea')
             }
         }
+        else if(event.key === 'Escape' && edit){
+            nodes[0].classList.remove('editing')
+        }
     }
-// }
-// function editTask(event){
-//     if(event.key === 'Enter'){
-//         if(!Number(event.target.value) && event.target.value.length !== 0){
-//         // const task = new Task({title: event.target, completed})
-//         event.target.value    
-//         }
-//         else{
-//             throw new Error('No se puede asignar esa tarea')
-//         }
-//     }
 }
 function tasks(){
             node.footer.classList.remove('visible')
             node.main.classList.remove('visible')
     }
-// function putTask(reload = false){
-//     if(reload == false){
-//         for(let i = 0; i < user.table.length; i++){
-//             if(user.table[i]){
-//                 for(let j = 0; j < user.table[i].length; j++){
-//                     if(reload == false){
-//                         structureTaskAdd(user.table[i][j][0], user.table[i][j][1])
-//                     }
-//                    else{
-//                         structureTaskAdd(user.table[i][j][0], user.table[i][j][1], true)
-//                    }
-//                 }
-//             }
-//         }
-//     }
-// }
-// function creatingStructure(){
-//     for(let i = 0; i < user.table.length; i++){
-//         if(user.table[i]){
-//             for(let j = 0; j < user.table[i].length; j++){
-//     structureTaskAdd(user.table[i][j][0], {clean: false})}}}
-// }
+function pendingTask(){
+    if(count != 1){
+        node.taskPending.innerHTML = `<strong>${count}<strong/> items left`
+    }
+    else{
+        node.taskPending.innerHTML = `<strong>${count}<strong/> item left`
+    }
+}
+function clearTask(){
+    let array = []
+    array.push(...node.listUnordened.children)
+    array.forEach(node => {
+        if(node.className === 'completed'){
+            inputLogic(node)
+            user.deleteKey(node.innerHTML)
+        }
+    });
+}
+function inputLogic(node){
+    // node.classList.add('completed')
+    return function(event){
+        node.classList.toggle('completed')
+        if(event.target.offsetParent.className == 'completed'){
+            user.addValue(event.target.nextSibling.innerText.trim(), true)
+            count--
+            pendingTask()
+        }
+        else{
+            user.addValue(event.target.nextSibling.innerText.trim(), false)
+            count++
+            pendingTask()
+        }
+    }
+}
+pendingTask()

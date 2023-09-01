@@ -43,4 +43,16 @@ export class User {
     const hash = this.hash(key)
     delete this.table[hash]
   }
+  getValue(boolean){
+    for(let i = 0; i < this.table.length; i++){
+      if(this.table[i]){
+        for(let j = 0 ; j < this.table[i].length; j++){
+          if(this.table[i][j][1] == boolean){
+            return this.table[i][j][1]
+          }
+        }
+      }
+    }
+    // return count
+  }
 }
