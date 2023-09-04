@@ -6,8 +6,17 @@ node.inputNewTodo.addEventListener('keydown', validateTask({}))
 node.buttonClear.addEventListener('click', clearTask)
 node.footer.classList.add('visible')
 node.main.classList.add('visible')
-const user = new User(50)
-console.log(user)
+
+function usingStorage(){
+    const structure = JSON.parse(localStorage.getItem('mydayapp-js'))
+    structure.forEach(bucket => {
+        if(bucket){
+            for(let j =0; j<bucket.length; j++){
+                structureTaskAdd(bucket[j][0])
+            }
+        }
+    })
+}
 function structureTaskAdd(text){
     const li = document.createElement('li')
     const div = document.createElement('div')
@@ -39,15 +48,19 @@ function validateTask({edit = false, nodes = null}){
         if(event.key === 'Enter'){
             if(!Number(event.target.value) && event.target.value.length !== 0){
                 const task = new Task({title: event.target.value})
+                const user = new User(50)
+                    user.table = JSON.parse(localStorage.getItem('mydayapp-js'))
                 if(edit){
                     console.log(event)
                     user.deleteKey(nodes[1].innerText)
                     nodes[0].classList.remove('editing')
                     nodes[1].innerText = task.title
                     user.addTask(task.title.trim(), task.completed)
+                    localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
                 }
                 else{
                 user.addTask(task.title.trim(), task.completed)
+                localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
                 node.inputNewTodo.value = ''
                 tasks()
                 structureTaskAdd(task.title)
@@ -68,6 +81,8 @@ function tasks(){
             node.footer.classList.remove('visible')
             node.main.classList.remove('visible')
     }
+    node.footer.classList.remove('visible')
+            node.main.classList.remove('visible')
 function pendingTask(){
     if(count != 1){
         node.taskPending.innerHTML = `<strong>${count}<strong/> items left`
@@ -81,25 +96,33 @@ function clearTask(){
     array.push(...node.listUnordened.children)
     array.forEach(node => {
         if(node.className === 'completed'){
-            inputLogic(node)
-            user.deleteKey(node.innerHTML)
+            const child = node.childNodes[0].childNodes[0]
+            child.click()
+            // user.deleteKey(node.innerHTML)
+            // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
         }
     });
 }
 function inputLogic(node){
-    // node.classList.add('completed')
+    const user = new User(50)
+    user.table = JSON.parse(localStorage.getItem('mydayapp-js'))
     return function(event){
         node.classList.toggle('completed')
         if(event.target.offsetParent.className == 'completed'){
             user.addValue(event.target.nextSibling.innerText.trim(), true)
+            localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
+            console.log(user)
             count--
             pendingTask()
         }
         else{
             user.addValue(event.target.nextSibling.innerText.trim(), false)
+            localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
             count++
+            console.log(user)
             pendingTask()
         }
     }
 }
 pendingTask()
+usingStorage()
