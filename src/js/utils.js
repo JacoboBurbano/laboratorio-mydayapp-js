@@ -11,7 +11,7 @@ export class User {
   hash(key){
     let total = 0
     for(let i = 0; i < key.length; i++){
-      total += key.charCodeAt(i) / 2
+      total += key.charCodeAt(i)
     }
     total = total % this.table.length
     return total
