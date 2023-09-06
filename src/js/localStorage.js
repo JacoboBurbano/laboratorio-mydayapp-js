@@ -51,13 +51,18 @@ export function deleteKeyLocal(key){
 export function incompleteTask(){
     let valor = JSON.parse(localStorage.getItem('mydayapp-js'))
     let bool = []
-    valor.forEach(bucket => {
-        if(bucket){
-            bucket.forEach(task => {
-                task[1] === false ? bool.push(task[1]) : false
-            })
-            // bucket[1] === false ? console.log(bucket): false
-        }
-    });
+    if(valor){
+        valor.forEach(bucket => {
+            if(bucket){
+                bucket.forEach(task => {
+                    task[1] === false ? bool.push(task[1]) : false
+                })
+                // bucket[1] === false ? console.log(bucket): false
+            }
+        });
+    }
+    else{
+        return bool
+    }
     return bool
 }
