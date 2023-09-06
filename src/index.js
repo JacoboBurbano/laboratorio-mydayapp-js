@@ -13,7 +13,7 @@ function usingStorage(){
     structure.forEach(bucket => {
         if(bucket){
             for(let j =0; j<bucket.length; j++){
-                structureTaskAdd(bucket[j][0])
+                structureTaskAdd(bucket[j][0], bucket[j][1])
             }
         }
     })
@@ -22,7 +22,7 @@ function usingStorage(){
         return
     }
 }
-function structureTaskAdd(text){
+function structureTaskAdd(text, bool = false){
     const li = document.createElement('li')
     const div = document.createElement('div')
     div.classList.add('view')
@@ -30,19 +30,28 @@ function structureTaskAdd(text){
     input.setAttribute('type', 'checkbox')
     input.classList.add('toggle')
     input.addEventListener('click', inputLogic(li))
+    if(bool){
+            input.click()
+    }
     const label = document.createElement('label')
     label.innerText = text
     li.addEventListener('dblclick', (event)=> {
         li.classList.toggle('editing')
         // console.log(event.target.parentElement.parentNode.className === editing)
+        inputEdit.setAttribute('autofocus')
+        inputEdit.placeholder = event.target.innerText
         inputEdit.value = event.target.innerText
         inputEdit.addEventListener('keydown', validateTask({edit : true, nodes : [li, label]}))
     })
     const button = document.createElement('button')
     button.classList.add('destroy')
+    button.addEventListener('click', (event) =>{
+        deleteKeyLocal(event.target.parentNode.childNodes[1].innerText)
+        node.listUnordened.removeChild(li)
+        pendingTask()
+    })
     const inputEdit = document.createElement('input')
     inputEdit.classList.add('edit')
-    inputEdit.setAttribute('autofocus', '')
     div.append(input ,label, button)
     li.append(div, inputEdit)
     node.listUnordened.appendChild(li)
@@ -111,8 +120,9 @@ function clearTask(){
 }
 function inputLogic(node){
     // user.table = JSON.parse(localStorage.getItem('mydayapp-js'))
-    return function(event){
-        node.classList.toggle('completed')
+    return async function(event){
+        try{
+            node.classList.toggle('completed')
         if(event.target.offsetParent.className == 'completed'){
             addValueLocal(event.target.nextSibling.innerText, true)
             // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
@@ -125,8 +135,15 @@ function inputLogic(node){
             count++
             pendingTask()
         }
+        }
+        catch(error){
+            return
+        }
     }
 }
 pendingTask()
+// setTimeout(() => {
+//     usingStorage()
+// }, 2000);
 usingStorage()
 tasks()
