@@ -1,13 +1,14 @@
 import "./css/base.css";
-import { Task, User } from "./js/utils";
 import node from "./js/nodes"
 import {addTaskLocal, addValueLocal, deleteKeyLocal, incompleteTask} from "./js/localStorage"
-let count =  incompleteTask().length
+import {countPendingLogic, pendingTask} from './js/updateCount'
+import { routes } from "./js/hashRouter";
+// let count =  incompleteTask().length
 node.inputNewTodo.addEventListener('keydown', validateTask({}))
 node.buttonClear.addEventListener('click', clearTask)
 node.footer.classList.add('visible')
 node.main.classList.add('visible')
-function usingStorage(){
+export function usingStorage(){
     try{
         const structure = JSON.parse(localStorage.getItem('mydayapp-js'))
     structure.forEach(bucket => {
@@ -38,7 +39,7 @@ function structureTaskAdd(text, bool = false){
     li.addEventListener('dblclick', (event)=> {
         li.classList.toggle('editing')
         // console.log(event.target.parentElement.parentNode.className === editing)
-        inputEdit.setAttribute('autofocus')
+        inputEdit.setAttribute('autofocus', '')
         inputEdit.placeholder = event.target.innerText
         inputEdit.value = event.target.innerText
         inputEdit.addEventListener('keydown', validateTask({edit : true, nodes : [li, label]}))
@@ -48,7 +49,11 @@ function structureTaskAdd(text, bool = false){
     button.addEventListener('click', (event) =>{
         deleteKeyLocal(event.target.parentNode.childNodes[1].innerText)
         node.listUnordened.removeChild(li)
-        pendingTask()
+        if(li.classList.contains('completed')){
+            return
+        }
+        countPendingLogic(false)
+        tasks()
     })
     const inputEdit = document.createElement('input')
     inputEdit.classList.add('edit')
@@ -74,9 +79,8 @@ function validateTask({edit = false, nodes = null}){
                 addTaskLocal(event.target.value)
                 // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
                 node.inputNewTodo.value = ''
+                countPendingLogic(true)
                 tasks()
-                count++
-                pendingTask()
                 }
             }
             else{
@@ -90,21 +94,22 @@ function validateTask({edit = false, nodes = null}){
 }
 function tasks(){
     if(!localStorage.getItem('mydayapp-js')){
-        return
+       return false
+    }
+    else if(node.taskPending.childNodes[0].firstChild.nodeValue < 1){
+        node.footer.classList.add('visible')
+        node.main.classList.add('visible')
     }
     else{
-        node.footer.classList.remove('visible')
-        node.main.classList.remove('visible')   
+        let table = JSON.parse(localStorage.getItem('mydayapp-js')) 
+        for(let i =0; i < table.length; i++){
+            if(table[i]){
+                node.footer.classList.remove('visible')
+                node.main.classList.remove('visible')   
+            }
+        }
     }
     }
-function pendingTask(){
-    if(count != 1){
-        node.taskPending.innerHTML = `<strong>${count}<strong/> items left`
-    }
-    else{
-        node.taskPending.innerHTML = `<strong>${count}<strong/> item left`
-    }
-}
 function clearTask(){
     let array = []
     array.push(...node.listUnordened.children)
@@ -126,14 +131,12 @@ function inputLogic(node){
         if(event.target.offsetParent.className == 'completed'){
             addValueLocal(event.target.nextSibling.innerText, true)
             // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
-            count--
-            pendingTask()
+           countPendingLogic(false)
         }
         else{
             addValueLocal(event.target.nextSibling.innerText, false)
             // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
-            count++
-            pendingTask()
+            countPendingLogic(true)
         }
         }
         catch(error){
@@ -142,8 +145,4 @@ function inputLogic(node){
     }
 }
 pendingTask()
-// setTimeout(() => {
-//     usingStorage()
-// }, 2000);
-usingStorage()
 tasks()
