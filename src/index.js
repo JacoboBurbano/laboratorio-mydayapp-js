@@ -8,13 +8,26 @@ node.inputNewTodo.addEventListener('keydown', validateTask({}))
 node.buttonClear.addEventListener('click', clearTask)
 node.footer.classList.add('visible')
 node.main.classList.add('visible')
-export function usingStorage(){
+export function usingStorage({pending= false, completed= false} = {}){
     try{
+        node.listUnordened.innerHTML = ''
         const structure = JSON.parse(localStorage.getItem('mydayapp-js'))
     structure.forEach(bucket => {
         if(bucket){
             for(let j =0; j<bucket.length; j++){
-                structureTaskAdd(bucket[j][0], bucket[j][1])
+                if(completed === false && pending === false){
+                    structureTaskAdd(bucket[j][0], bucket[j][1])
+                }
+                else if(completed === true){
+                    if(bucket[j][1] === true){
+                        structureTaskAdd(bucket[j][0], bucket[j][1])
+                    }
+                }
+                else if(pending === true){
+                    if(bucket[j][1] === false){
+                        structureTaskAdd(bucket[j][0], bucket[j][1])
+                    }
+                }
             }
         }
     })

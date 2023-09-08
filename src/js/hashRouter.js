@@ -4,10 +4,10 @@ window.addEventListener('DOMContentLoaded', routes, false)
 export function routes() {
     switch (location.hash) {
         case '#/pending':
-            console.log('mostrar tareas pendientes')
+            usingStorage({pending: true})
             break;
         case '#/completed':
-            console.log('completadas')
+            usingStorage({completed: true})
             break;
         case '#/':
             usingStorage()
