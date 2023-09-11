@@ -57,7 +57,6 @@ export function incompleteTask(){
                 bucket.forEach(task => {
                     task[1] === false ? bool.push(task[1]) : false
                 })
-                // bucket[1] === false ? console.log(bucket): false
             }
         });
     }
@@ -65,4 +64,16 @@ export function incompleteTask(){
         return bool
     }
     return bool
+}
+export function getKeyLocal(key){
+    const user = new User(50)
+    let valor = JSON.parse(localStorage.getItem('mydayapp-js'))
+for(let i = 0; i < valor.length; i++){
+        if(valor[i]){
+            for(let j=0; j < valor[i].length; j++){
+                user.addTask(valor[i][j][0], valor[i][j][1])
+            }
+        }
+    }
+    return user.getKey(key)[0]
 }

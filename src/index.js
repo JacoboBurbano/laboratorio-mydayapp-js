@@ -1,9 +1,8 @@
 import "./css/base.css";
 import node from "./js/nodes"
-import {addTaskLocal, addValueLocal, deleteKeyLocal, incompleteTask} from "./js/localStorage"
+import {addTaskLocal, addValueLocal, deleteKeyLocal, getKeyLocal} from "./js/localStorage"
 import {countPendingLogic, pendingTask} from './js/updateCount'
 import { routes } from "./js/hashRouter";
-// let count =  incompleteTask().length
 node.inputNewTodo.addEventListener('keydown', validateTask({}))
 node.buttonClear.addEventListener('click', clearTask)
 node.footer.classList.add('visible')
@@ -51,11 +50,10 @@ function structureTaskAdd(text, bool = false){
     label.innerText = text
     li.addEventListener('dblclick', (event)=> {
         li.classList.toggle('editing')
-        // console.log(event.target.parentElement.parentNode.className === editing)
         inputEdit.setAttribute('autofocus', '')
         inputEdit.placeholder = event.target.innerText
         inputEdit.value = event.target.innerText
-        inputEdit.addEventListener('keydown', validateTask({edit : true, nodes : [li, label]}))
+        inputEdit.addEventListener('keydown', validateTask({edit : true, parentNode : li, nodeValue : label}))
     })
     const button = document.createElement('button')
     button.classList.add('destroy')
@@ -75,25 +73,27 @@ function structureTaskAdd(text, bool = false){
     node.listUnordened.appendChild(li)
 
 }
-function validateTask({edit = false, nodes = null}){
+function validateTask({edit = false, parentNode = null, nodeValue = null}){
     return function(event){
         if(event.key === 'Enter'){
             if(!Number(event.target.value) && event.target.value.length !== 0){
-                    // user.table = JSON.parse(localStorage.getItem('mydayapp-js'))
                 if(edit){
-                    deleteKeyLocal(nodes[1].innerText)
-                    nodes[0].classList.remove('editing')
-                    nodes[1].innerText = event.target.value
+                    deleteKeyLocal(nodeValue.innerText)
+                    parentNode.classList.remove('editing')
+                    nodeValue.innerText = event.target.value
                     addTaskLocal(event.target.value)
-                    // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
                 }
                 else{
-                structureTaskAdd(event.target.value)
+                if(getKeyLocal(event.target.value.trim())){
+                    node.inputNewTodo.value = ''
+                }
+                else{
+                    structureTaskAdd(event.target.value)
                 addTaskLocal(event.target.value)
-                // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
                 node.inputNewTodo.value = ''
                 countPendingLogic(true)
                 tasks()
+                }
                 }
             }
             else{
@@ -101,7 +101,7 @@ function validateTask({edit = false, nodes = null}){
             }
         }
         else if(event.key === 'Escape' && edit){
-            nodes[0].classList.remove('editing')
+            parentNode.classList.remove('editing')
         }
     }
 }
@@ -128,27 +128,22 @@ function clearTask(){
     array.push(...node.listUnordened.children)
     array.forEach(node => {
         if(node.className === 'completed'){
-            const child = node.childNodes[0].childNodes[0]
+            const child = node.childNodes[0].childNodes[2]
             child.click()
-            deleteKeyLocal(node.innerHTML)
-            // user.deleteKey(node.innerHTML)
-            // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
+            tasks()
         }
     });
 }
 function inputLogic(node){
-    // user.table = JSON.parse(localStorage.getItem('mydayapp-js'))
     return async function(event){
         try{
             node.classList.toggle('completed')
         if(event.target.offsetParent.className == 'completed'){
             addValueLocal(event.target.nextSibling.innerText, true)
-            // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
            countPendingLogic(false)
         }
         else{
             addValueLocal(event.target.nextSibling.innerText, false)
-            // localStorage.setItem('mydayapp-js', JSON.stringify(user.table))
             countPendingLogic(true)
         }
         }

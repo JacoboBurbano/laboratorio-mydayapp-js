@@ -33,10 +33,15 @@ export class User {
   }
   getKey(key){
     const hash = this.hash(key)
-    for(let i = 0; i < this.table[hash].length; i++){
-      if(this.table[hash][i][0] === key){
-        return this.table[hash][i]
+    if(this.table[hash]){
+      for(let i = 0; i < this.table[hash].length; i++){
+        if(this.table[hash][i][0] === key){
+          return this.table[hash][i]
+        }
       }
+    }
+    else{
+      return false
     }
   }
   deleteKey(key){
